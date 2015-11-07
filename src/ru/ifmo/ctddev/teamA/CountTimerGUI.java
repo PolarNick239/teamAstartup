@@ -57,7 +57,7 @@ public class CountTimerGUI {
         frame.setVisible(true);
         frame.pack();
 
-        cntd = new CountTimer();
+        cntd = new CountTimer("tmp.ser");
 
     }
 
@@ -68,37 +68,60 @@ public class CountTimerGUI {
     private class CountTimer implements ActionListener {
 
         private static final int ONE_SECOND = 1000;
-        private int count = 0;
-        private boolean isTimerActive = false;
+        private State state;
         private Timer tmr = new Timer(ONE_SECOND, this);
 
-        public CountTimer() {
-            count = 0;
-            setTimerText(TimeFormat(count));
+        public CountTimer(String path) {
+            this(new State(-1, -1, path));
+        }
+
+        public CountTimer(State state) {
+            this.state = state;
+            updateTimerText();
+            if (this.state.isTimerActive()) {
+                resume();
+            }
+        }
+
+        private void updateTimerText() {
+            if (state.getStartTime() == -1) {
+                setTimerText(TimeFormat(0));
+            } else {
+                setTimerText(TimeFormat(getCurrent() / 1000));
+            }
+        }
+
+        private long getCurrent() {
+            if (!state.isTimerActive()) {
+                return state.getPausedValue();
+            }else {
+                return System.currentTimeMillis() - state.getStartTime();
+            }
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            if (isTimerActive) {
-                count++;
-                setTimerText(TimeFormat(count));
+            if (state.isTimerActive()) {
+                updateTimerText();
             }
         }
 
         public void resume() {
-            isTimerActive = true;
+            state.setStartTime(System.currentTimeMillis() - getCurrent());
+            state.setTimerActive(true);
             tmr.restart();
         }
 
         public void pause() {
-            isTimerActive = false;
+            state.setPausedValue(getCurrent());
+            state.setTimerActive(false);
         }
     }
 
-    private String TimeFormat(int count) {
-        int hours = count / 3600;
-        int minutes = (count - hours * 3600) / 60;
-        int seconds = count - minutes * 60;
+    private String TimeFormat(long count) {
+        int hours = (int) (count / 3600);
+        int minutes = (int) ((count - hours * 3600) / 60);
+        int seconds = (int) (count - minutes * 60);
         LocalTime localTime = LocalTime.of(hours, minutes, seconds);
         return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
