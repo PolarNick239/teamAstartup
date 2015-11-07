@@ -12,15 +12,13 @@ import java.time.format.DateTimeFormatter;
  */
 public class CountTimerGUI {
 
-    private JFrame frame;
-    private JPanel panel;
-
     private JLabel timeLabel = new JLabel();
 
     private JButton startBtn = new JButton("Start");
     private JButton pauseBtn = new JButton("Pause");
+    private JButton stopBtn = new JButton("Stop");
 
-    private CountTimer cntd;
+    private CountTimer countTimer;
 
 
     public CountTimerGUI() {
@@ -29,21 +27,22 @@ public class CountTimerGUI {
     }
 
     private void GUI() {
-        frame = new JFrame();
-        panel = new JPanel();
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
 
         panel.setLayout(new BorderLayout());
         timeLabel.setBorder(BorderFactory.createRaisedBevelBorder());
         panel.add(timeLabel, BorderLayout.NORTH);
 
-        startBtn.addActionListener(e -> cntd.resume());
-        pauseBtn.addActionListener(e -> cntd.pause());
-
+        startBtn.addActionListener(e -> countTimer.resume());
+        pauseBtn.addActionListener(e -> countTimer.pause());
+        stopBtn.addActionListener(e -> countTimer.stop());
         JPanel cmdPanel = new JPanel();
         cmdPanel.setLayout(new GridLayout());
 
         cmdPanel.add(startBtn);
         cmdPanel.add(pauseBtn);
+        cmdPanel.add(stopBtn);
 
         panel.add(cmdPanel, BorderLayout.SOUTH);
 
@@ -57,7 +56,7 @@ public class CountTimerGUI {
         frame.setVisible(true);
         frame.pack();
 
-        cntd = new CountTimer("tmp.ser");
+        countTimer = new CountTimer("tmp.ser");
 
     }
 
@@ -115,6 +114,13 @@ public class CountTimerGUI {
         public void pause() {
             state.setPausedValue(getCurrent());
             state.setTimerActive(false);
+        }
+
+        public void stop() {
+            state.setStartTime(0);
+            state.setPausedValue(0);
+            state.setTimerActive(false);
+            updateTimerText();
         }
     }
 
