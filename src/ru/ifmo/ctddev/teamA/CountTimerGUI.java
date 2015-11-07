@@ -108,18 +108,26 @@ public class CountTimerGUI {
         public void resume() {
             state.setStartTime(System.currentTimeMillis() - getCurrent());
             state.setTimerActive(true);
+            pauseBtn.setVisible(true);
+            stopBtn.setVisible(true);
+            startBtn.setVisible(false);
             tmr.restart();
         }
 
         public void pause() {
             state.setPausedValue(getCurrent());
             state.setTimerActive(false);
+            pauseBtn.setVisible(false);
+            startBtn.setVisible(true);
         }
 
         public void stop() {
             state.setStartTime(0);
             state.setPausedValue(0);
             state.setTimerActive(false);
+            pauseBtn.setVisible(false);
+            stopBtn.setVisible(false);
+            startBtn.setVisible(true);
             updateTimerText();
         }
     }
