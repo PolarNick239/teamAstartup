@@ -15,6 +15,7 @@ public class CountTimerGUI {
     private static final int SECONDS_PER_MINUTE = 60;
     private static final int MINUTES_PER_HOUR = 60;
     private static final int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+    private static final String BACKUP_FILE_PATH = "tmp.ser";
 
     private JLabel timeLabel = new JLabel();
 
@@ -60,7 +61,7 @@ public class CountTimerGUI {
         frame.setVisible(true);
         frame.pack();
 
-        countTimer = new CountTimer("tmp.ser");
+        countTimer = new CountTimer(BACKUP_FILE_PATH);
 
     }
 
@@ -70,9 +71,9 @@ public class CountTimerGUI {
 
     private class CountTimer implements ActionListener {
 
-        private static final int SECONDS_PER_HOUR = 1000;
+        private static final int MILLIS_PER_SECOND = 1000;
         private State state;
-        private Timer tmr = new Timer(SECONDS_PER_HOUR, this);
+        private Timer tmr = new Timer(MILLIS_PER_SECOND, this);
 
         public CountTimer(String path) {
             this(new State(-1, -1, path));
@@ -90,7 +91,7 @@ public class CountTimerGUI {
             if (state.getStartTime() == -1) {
                 setTimerText(TimeFormat(0));
             } else {
-                setTimerText(TimeFormat(getCurrent() / SECONDS_PER_HOUR));
+                setTimerText(TimeFormat(getCurrent() / MILLIS_PER_SECOND));
             }
         }
 
