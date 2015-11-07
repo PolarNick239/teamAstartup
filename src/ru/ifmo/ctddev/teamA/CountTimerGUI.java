@@ -26,7 +26,7 @@ public class CountTimerGUI {
 
 
     public CountTimerGUI() {
-        setTimerText("         ");
+        setTimerText("         "); //tak nnnnnaaaado
         GUI();
     }
 
@@ -70,9 +70,9 @@ public class CountTimerGUI {
 
     private class CountTimer implements ActionListener {
 
-        private static final int ONE_SECOND = 1000;
+        private static final int SECONDS_PER_HOUR = 1000;
         private State state;
-        private Timer tmr = new Timer(ONE_SECOND, this);
+        private Timer tmr = new Timer(SECONDS_PER_HOUR, this);
 
         public CountTimer(String path) {
             this(new State(-1, -1, path));
@@ -90,7 +90,7 @@ public class CountTimerGUI {
             if (state.getStartTime() == -1) {
                 setTimerText(TimeFormat(0));
             } else {
-                setTimerText(TimeFormat(getCurrent() / ONE_SECOND));
+                setTimerText(TimeFormat(getCurrent() / SECONDS_PER_HOUR));
             }
         }
 
