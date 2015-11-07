@@ -12,6 +12,10 @@ import java.time.format.DateTimeFormatter;
  */
 public class CountTimerGUI {
 
+    private static final int SECONDS_PER_MINUTE = 60;
+    private static final int MINUTES_PER_HOUR = 60;
+    private static final int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+
     private JLabel timeLabel = new JLabel();
 
     private JButton startBtn = new JButton("Start");
@@ -86,14 +90,14 @@ public class CountTimerGUI {
             if (state.getStartTime() == -1) {
                 setTimerText(TimeFormat(0));
             } else {
-                setTimerText(TimeFormat(getCurrent() / 1000));
+                setTimerText(TimeFormat(getCurrent() / ONE_SECOND));
             }
         }
 
         private long getCurrent() {
             if (!state.isTimerActive()) {
                 return state.getPausedValue();
-            }else {
+            } else {
                 return System.currentTimeMillis() - state.getStartTime();
             }
         }
@@ -133,9 +137,9 @@ public class CountTimerGUI {
     }
 
     private String TimeFormat(long count) {
-        int hours = (int) (count / 3600);
-        int minutes = (int) ((count - hours * 3600) / 60);
-        int seconds = (int) (count - minutes * 60);
+        int hours = (int) (count / SECONDS_PER_HOUR);
+        int minutes = (int) ((count - hours * SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
+        int seconds = (int) (count - minutes * SECONDS_PER_MINUTE);
         LocalTime localTime = LocalTime.of(hours, minutes, seconds);
         return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
