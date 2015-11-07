@@ -4,11 +4,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * @author Ilya Isaev
  */
-public class CountTimerGUI implements ActionListener {
+public class CountTimerGUI {
 
     private JFrame frame;
     private JPanel panel;
@@ -17,12 +19,6 @@ public class CountTimerGUI implements ActionListener {
 
     private JButton startBtn = new JButton("Start");
     private JButton pauseBtn = new JButton("Pause");
-    private JButton resumeBtn = new JButton("Resume");
-    private JButton stopBtn = new JButton("Stop");
-    private JButton resetBtn = new JButton("Reset");
-
-    private JButton greenBtn = new JButton("Green");
-    private JButton redBtn = new JButton("Red");
 
     private CountTimer cntd;
 
@@ -40,30 +36,19 @@ public class CountTimerGUI implements ActionListener {
         timeLabel.setBorder(BorderFactory.createRaisedBevelBorder());
         panel.add(timeLabel, BorderLayout.NORTH);
 
-        startBtn.addActionListener(this);
-        pauseBtn.addActionListener(this);
-        resumeBtn.addActionListener(this);
-        stopBtn.addActionListener(this);
-        resetBtn.addActionListener(this);
-        greenBtn.addActionListener(this);
-        redBtn.addActionListener(this);
+        startBtn.addActionListener(e -> cntd.resume());
+        pauseBtn.addActionListener(e -> cntd.pause());
 
         JPanel cmdPanel = new JPanel();
         cmdPanel.setLayout(new GridLayout());
 
         cmdPanel.add(startBtn);
         cmdPanel.add(pauseBtn);
-        cmdPanel.add(resumeBtn);
-        cmdPanel.add(stopBtn);
-        cmdPanel.add(resetBtn);
 
         panel.add(cmdPanel, BorderLayout.SOUTH);
 
         JPanel clrPanel = new JPanel();
-        clrPanel.setLayout(new GridLayout(0,1));
-
-        clrPanel.add(greenBtn);
-        clrPanel.add(redBtn);
+        clrPanel.setLayout(new GridLayout(0, 1));
 
         panel.add(clrPanel, BorderLayout.EAST);
 
@@ -80,26 +65,6 @@ public class CountTimerGUI implements ActionListener {
         timeLabel.setText(sTime);
     }
 
-
-    private void setTimerColor(Color sColor) {
-        timeLabel.setForeground(sColor);
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        // TODO Auto-generated method stub
-
-        JButton btn = (JButton) e.getSource();
-
-        if (btn.equals(greenBtn))        { setTimerColor(Color.GREEN.darker()); }
-        else if (btn.equals(redBtn))     { setTimerColor(Color.RED); }
-        else if (btn.equals(startBtn))   { cntd.start(); }
-        else if (btn.equals(pauseBtn))   { cntd.pause(); }
-        else if (btn.equals(resumeBtn))  { cntd.resume(); }
-        else if (btn.equals(stopBtn))    { cntd.stop(); }
-        else if (btn.equals(resetBtn))   { cntd.reset(); }
-    }
-
     private class CountTimer implements ActionListener {
 
         private static final int ONE_SECOND = 1000;
@@ -108,7 +73,7 @@ public class CountTimerGUI implements ActionListener {
         private Timer tmr = new Timer(ONE_SECOND, this);
 
         public CountTimer() {
-            count=0;
+            count = 0;
             setTimerText(TimeFormat(count));
         }
 
@@ -120,40 +85,21 @@ public class CountTimerGUI implements ActionListener {
             }
         }
 
-        public void start() {
-            count = 0;
-            isTimerActive = true;
-            tmr.start();
-        }
-
         public void resume() {
             isTimerActive = true;
             tmr.restart();
         }
 
-        public void stop() {
-            tmr.stop();
-        }
-
         public void pause() {
             isTimerActive = false;
         }
-
-        public void reset() {
-            count = 0;
-            isTimerActive = true;
-            tmr.restart();
-
-        }
-
     }
 
     private String TimeFormat(int count) {
-
         int hours = count / 3600;
-        int minutes = (count-hours*3600)/60;
-        int seconds = count-minutes*60;
-
-        return String.format("%02d", hours) + " : " + String.format("%02d", minutes) + " : " + String.format("%02d", seconds);
+        int minutes = (count - hours * 3600) / 60;
+        int seconds = count - minutes * 60;
+        LocalTime localTime = LocalTime.of(hours, minutes, seconds);
+        return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }
 }
