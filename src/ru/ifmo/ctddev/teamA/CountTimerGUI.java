@@ -12,38 +12,42 @@ import java.time.format.DateTimeFormatter;
  */
 public class CountTimerGUI {
 
-    private JFrame frame;
-    private JPanel panel;
+    private static final int SECONDS_PER_MINUTE = 60;
+    private static final int MINUTES_PER_HOUR = 60;
+    private static final int SECONDS_PER_HOUR = SECONDS_PER_MINUTE * MINUTES_PER_HOUR;
+    private static final String BACKUP_FILE_PATH = "tmp.ser";
 
     private JLabel timeLabel = new JLabel();
 
     private JButton startBtn = new JButton("Start");
     private JButton pauseBtn = new JButton("Pause");
+    private JButton stopBtn = new JButton("Stop");
 
-    private CountTimer cntd;
+    private CountTimer countTimer;
 
 
     public CountTimerGUI() {
-        setTimerText("         ");
+        setTimerText("         "); //tak nnnnnaaaado
         GUI();
     }
 
     private void GUI() {
-        frame = new JFrame();
-        panel = new JPanel();
+        JFrame frame = new JFrame();
+        JPanel panel = new JPanel();
 
         panel.setLayout(new BorderLayout());
         timeLabel.setBorder(BorderFactory.createRaisedBevelBorder());
         panel.add(timeLabel, BorderLayout.NORTH);
 
-        startBtn.addActionListener(e -> cntd.resume());
-        pauseBtn.addActionListener(e -> cntd.pause());
-
+        startBtn.addActionListener(e -> countTimer.resume());
+        pauseBtn.addActionListener(e -> countTimer.pause());
+        stopBtn.addActionListener(e -> countTimer.stop());
         JPanel cmdPanel = new JPanel();
         cmdPanel.setLayout(new GridLayout());
 
         cmdPanel.add(startBtn);
         cmdPanel.add(pauseBtn);
+        cmdPanel.add(stopBtn);
 
         panel.add(cmdPanel, BorderLayout.SOUTH);
 
@@ -57,7 +61,7 @@ public class CountTimerGUI {
         frame.setVisible(true);
         frame.pack();
 
-        cntd = new CountTimer("tmp.ser");
+        countTimer = new CountTimer(BACKUP_FILE_PATH);
 
     }
 
@@ -67,9 +71,9 @@ public class CountTimerGUI {
 
     private class CountTimer implements ActionListener {
 
-        private static final int ONE_SECOND = 1000;
+        private static final int MILLIS_PER_SECOND = 1000;
         private State state;
-        private Timer tmr = new Timer(ONE_SECOND, this);
+        private Timer tmr = new Timer(MILLIS_PER_SECOND, this);
 
         public CountTimer(String path) {
             this(new State(-1, -1, path));
@@ -87,14 +91,14 @@ public class CountTimerGUI {
             if (state.getStartTime() == -1) {
                 setTimerText(TimeFormat(0));
             } else {
-                setTimerText(TimeFormat(getCurrent() / 1000));
+                setTimerText(TimeFormat(getCurrent() / MILLIS_PER_SECOND));
             }
         }
 
         private long getCurrent() {
             if (!state.isTimerActive()) {
                 return state.getPausedValue();
-            }else {
+            } else {
                 return System.currentTimeMillis() - state.getStartTime();
             }
         }
@@ -109,19 +113,34 @@ public class CountTimerGUI {
         public void resume() {
             state.setStartTime(System.currentTimeMillis() - getCurrent());
             state.setTimerActive(true);
+            pauseBtn.setVisible(true);
+            stopBtn.setVisible(true);
+            startBtn.setVisible(false);
             tmr.restart();
         }
 
         public void pause() {
             state.setPausedValue(getCurrent());
             state.setTimerActive(false);
+            pauseBtn.setVisible(false);
+            startBtn.setVisible(true);
+        }
+
+        public void stop() {
+            state.setStartTime(0);
+            state.setPausedValue(0);
+            state.setTimerActive(false);
+            pauseBtn.setVisible(false);
+            stopBtn.setVisible(false);
+            startBtn.setVisible(true);
+            updateTimerText();
         }
     }
 
     private String TimeFormat(long count) {
-        int hours = (int) (count / 3600);
-        int minutes = (int) ((count - hours * 3600) / 60);
-        int seconds = (int) (count - minutes * 60);
+        int hours = (int) (count / SECONDS_PER_HOUR);
+        int minutes = (int) ((count - hours * SECONDS_PER_HOUR) / SECONDS_PER_MINUTE);
+        int seconds = (int) (count - minutes * SECONDS_PER_MINUTE);
         LocalTime localTime = LocalTime.of(hours, minutes, seconds);
         return localTime.format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }

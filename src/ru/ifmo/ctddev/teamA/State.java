@@ -1,11 +1,13 @@
 package ru.ifmo.ctddev.teamA;
 
 import java.io.*;
+import java.util.logging.Logger;
 
 /**
  * @author Polyarnyi Nickolay, PolarNick239
  */
 public class State implements Serializable {
+    public static final Logger LOG = Logger.getLogger(State.class.getName());
 
     private long startTime;
     private long pausedValue;
@@ -47,18 +49,19 @@ public class State implements Serializable {
     }
 
     private void load() {
-        try(
+        try (
                 InputStream file = new FileInputStream(this.path);
                 InputStream buffer = new BufferedInputStream(file);
-                ObjectInput input = new ObjectInputStream (buffer)
+                ObjectInput input = new ObjectInputStream(buffer)
         ) {
             State state = (State) input.readObject();
             this.setPausedValue(state.getPausedValue());
             this.setStartTime(state.getStartTime());
             this.setTimerActive(state.isTimerActive());
         } catch (InvalidClassException | FileNotFoundException ignored) {
+            //TODO YOU MUST NOT IGNORE EXCEPTIONS BITCHES
         } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.severe(e.getMessage());
         }
     }
 
@@ -69,7 +72,7 @@ public class State implements Serializable {
         ) {
             output.writeObject(this);
         } catch (IOException ex) {
-            ex.printStackTrace();
+            LOG.severe(ex.getMessage());
         }
     }
 
