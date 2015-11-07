@@ -53,7 +53,7 @@ public class CountTimerGUI {
         panel.add(clrPanel, BorderLayout.EAST);
 
         frame.setContentPane(panel);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.pack();
 
