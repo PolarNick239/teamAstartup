@@ -1,17 +1,11 @@
 package ru.ifmo.ctddev.teamA;
 
-import java.awt.*;
-
 public class Main {
 
     public static void main(String[] args) {
-
-        EventQueue.invokeLater(new Runnable() {
-
-            @Override
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                SimpleEx ex = new SimpleEx();
-                ex.setVisible(true);
+                new CountTimerGUI();
             }
         });
     }
